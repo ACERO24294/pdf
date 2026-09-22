@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente de Crédito - PWA</title>
+    <!-- Librería PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 12px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 650px;
+            height: 92vh;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Encabezado */
+        .app-header {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 18px 20px;
+            text-align: center;
+        }
+
+        .app-header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .app-header p {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        /* Tarjeta de Estado / Control de Archivo */
+        .card-status {
+            background: #ffffff;
+            margin: 12px 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .status-text {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .file-upload-btn {
+            background: #eff6ff;
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .file-upload-btn:hover {
+            background: #dbeafe;
+        }
+
+        #pdfFile {
+            display: none;
+        }
+
+        /* Contenedor de Mensajes (Estilo Tarjetas) */
+        .chat-messages {
+            flex: 1;
+            padding: 0 16px 16px 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 85%;
+            line-height: 1.5;
+            font-size: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-message.bot {
+            background: #f1f5f9;
+            color: var(--text-main);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-message.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Área de Input */
+        .chat-input-area {
+            display: flex;
+            padding: 14px 16px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            gap: 8px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            outline: none;
+            font-size: 14px;
+            background: #f8fafc;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-area input:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .chat-input-area button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .chat-input-area button:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
+        .chat-input-area button:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Encabezado -->
+    <div class="app-header">
+        <h1>Asistente Inteligente</h1>
+        <p>Consulta el manual y documentos de forma interactiva</p>
+    </div>
+
+    <!-- Tarjeta de Estado y Carga de PDF -->
+    <div class="card-status">
+        <div class="status-row">
+            <span id="statusText" class="status-text">Estado: Esperando documento...</span>
+            <label class="file-upload-btn" for="pdfFile">Cambiar PDF</label>
+            <input type="file" id="pdfFile" accept=".pdf">
+        </div>
+    </div>
+
+    <!-- Historial del Chat en Tarjetas -->
+    <div class="chat-messages" id="chatMessages">
+        <div class="card-message bot">
+            ¡Hola! Carga tu documento PDF o selecciona uno para comenzar a hacerle preguntas de manera inmediata.
+        </div>
+    </div>
+
+    <!-- Barra inferior de escritura -->
+    <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Escribe tu consulta aquí..." disabled>
+        <button id="sendBtn" onclick="enviarMensaje()" disabled>Enviar</button>
+    </div>
+</div>
+
+<script>
+    let textoCompletoPDF = "";
+
+    // 1. Intento de carga automática local/remota (si el servidor lo permite)
+    window.addEventListener('DOMContentLoaded', async () => {
+        const rutaAutomatica = 'chat.pdf'; // Coloca aquí el nombre exacto de tu PDF
+        try {
+            const respuesta = await fetch(rutaAutomatica);
+            if (respuesta.ok) {
+                const blob = await respuesta.blob();
+                procesarArchivoPDF(blob);
+            } else {
+                document.getElementById('statusText').textContent = "Selecciona tu PDF localmente abajo ↓";
+            }
+        } catch (e) {
+            document.getElementById('statusText').textContent = "Modo local: Sube tu PDF para iniciar.";
+        }
+    });
+
+    // 2. Carga manual mediante el selector (indispensable para pruebas locales por seguridad del navegador)
+    document.getElementById('pdfFile').addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            procesarArchivoPDF(file);
+        }
+    });
+
+    // Función unificada para procesar el PDF con PDF.js
+    async function procesarArchivoPDF(source) {
+        const statusText = document.getElementById('statusText');
+        statusText.textContent = "Procesando documento...";
+
+        try {
+            const arrayBuffer = await (source instanceof Blob ? source.arrayBuffer() : source);
+            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+            const pdfDoc = await loadingTask.promise;
+            
+            let textoAcumulado = "";
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const textContent = await page.getTextContent();
+                const textItems = textContent.items.map(item => item.str);
+                textoAcumulado += textItems.join(" ") + "\n";
+            }
+
+            textoCompletoPDF = textoAcumulado;
+            statusText.textContent = `✓ Documento listo (${pdfDoc.numPages} páginas)`;
+            
+            document.getElementById('userInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            
+            agregarMensajeBot(`¡Documento cargado con éxito! Ya puedes hacerme preguntas sobre su contenido.`);
+        } catch (error) {
+            console.error(error);
+            statusText.textContent = "Error al leer el PDF.";
+            agregarMensajeBot("⚠️ Hubo un problema al procesar el archivo PDF.");
+        }
+    }
+
+    // Manejo de mensajes del chat
+    function enviarMensaje() {
+        const input = document.getElementById('userInput');
+        const pregunta = input.value.trim();
+        if (!pregunta) return;
+
+        agregarMensajeUsuario(pregunta);
+        input.value = "";
+
+        setTimeout(() => {
+            const respuesta = buscarRespuestaEnTexto(pregunta, textoCompletoPDF);
+            agregarMensajeBot(respuesta);
+        }, 300);
+    }
+
+    function agregarMensajeUsuario(texto) {
+        const chatMessages = document.getElementById('chatMessages');
+        const div = document.createElement('div');
+        div.className = 'card-message user';
+        div.textContent = texto;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function agregarMensajeBot(texto) {
+        const chatMessages = document.getElementById('chatMessages');
+        const div = document.createElement('div');
+        div.className = 'card-message bot';
+        div.textContent = texto;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Buscador de contexto
+    function buscarRespuestaEnTexto(pregunta, texto) {
+        if (!texto) return "Primero debes cargar un documento PDF.";
+
+        const parrafos = texto.split(/\r?\n/);
+        const palabrasClave = pregunta.toLowerCase().replace(/[¿?]/g, "").split(" ").filter(p => p.length > 3);
+
+        let mejoresCoincidencias = [];
+
+        for (let parrafo of parrafos) {
+            let parrafoLower = parrafo.toLowerCase();
+            let puntaje = 0;
+            
+            for (let palabra of palabrasClave) {
+                if (parrafoLower.includes(palabra)) {
+                    puntaje++;
+                }
+            }
+
+            if (puntaje > 0 && parrafo.trim().length > 20) {
+                mejoresCoincidencias.push({ texto: parrafo.trim(), score: puntaje });
+            }
+        }
+
+        mejoresCoincidencias.sort((a, b) => b.score - a.score);
+
+        if (mejoresCoincidencias.length > 0) {
+            let resultado = "Esto es lo que encontré en el documento:\n\n";
+            resultado += `• "${mejoresCoincidencias[0].texto}"`;
+            if (mejoresCoincidencias[1]) {
+                resultado += `\n\n• "${mejoresCoincidencias[1].texto}"`;
+            }
+            return resultado;
+        } else {
+            return "No encontré coincidencias exactas para tu pregunta. Intenta usar otras palabras clave.";
+        }
+    }
+
+    document.getElementById('userInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            enviarMensaje();
+        }
+    });
+</script>
+
+</body>
+</html>
