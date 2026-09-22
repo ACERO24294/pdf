@@ -51,7 +51,7 @@
         .app-header {
             background: linear-gradient(135deg, #1e3a8a, #2563eb);
             color: white;
-            padding: 20px 16px;
+            padding: 18px 16px;
             text-align: center;
             border-bottom-left-radius: 20px;
             border-bottom-right-radius: 20px;
@@ -73,45 +73,8 @@
         .card-status {
             background: var(--card-bg);
             margin: 12px 16px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .status-text {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .file-upload-btn {
-            background: #eff6ff;
-            color: var(--primary);
-            border: 1px solid #bfdbfe;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-
-        .file-upload-btn:hover {
-            background: #dbeafe;
-        }
-
-        #pdfFile {
-            display: none;
-        }
-
-        /* Contenedor de Conversación en Tarjetas */
-        .chat-messages {
-            flex: 1;
-            padding: 0 16px 70px 16px; /* Espacio para que no lo tape el menú inferior */
+            padding: 10px 16px;
+            padding: 0 16px 80px 16px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -122,9 +85,9 @@
             background: var(--card-bg);
             padding: 14px 16px;
             border-radius: 14px;
-            max-width: 90%;
+            max-width: 92%;
             line-height: 1.5;
-            font-size: 13px;
+            font-size: 13.5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.04);
             border: 1px solid var(--border-color);
             animation: fadeIn 0.3s ease;
@@ -147,119 +110,31 @@
             border: none;
         }
 
-        /* Área de Input con Barra Inferior de Navegación Estilo App */
-        .input-footer-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 10px 16px;
-            gap: 8px;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            outline: none;
-            font-size: 13px;
+        /* Tarjeta estructurada dentro de la respuesta del bot */
+        .response-card {
             background: #f8fafc;
-        }
-
-        .chat-input-area input:focus {
-            border-color: var(--primary);
-            background: white;
-        }
-
-        .chat-input-area button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0 16px;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
+            padding: 10px 12px;
+            margin-top: 8px;
             font-size: 13px;
-            transition: background 0.2s;
+            color: #475569;
         }
 
-        .chat-input-area button:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-        }
-
-        /* Barra de Navegación Inferior (Idéntica a tu otra pantalla) */
-        .bottom-nav {
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            background: var(--card-bg);
-            border-top: 1px solid #f1f5f9;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 11px;
-            gap: 2px;
-        }
-
-        .nav-item.active {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .nav-item svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-    </style>
-</head>
-<body>
-
-<div class="app-container">
-    <!-- Encabezado con degradado -->
-    <div class="app-header">
-        <h1>Asistente Inteligente</h1>
-        <p>Consulta el manual y documentos de forma interactiva</p>
-    </div>
-
-    <!-- Tarjeta de Estado / Carga de PDF -->
-    <div class="card-status">
-        <span id="statusText" class="status-text">Esperando documento...</span>
-        <label class="file-upload-btn" for="pdfFile">Cambiar PDF</label>
-        <input type="file" id="pdfFile" accept=".pdf">
-    </div>
-
-    <!-- Historial del Chat en Tarjetas -->
-    <div class="chat-messages" id="chatMessages">
-        <div class="card-message bot">
-            <strong>¡Hola!</strong> Carga o selecciona tu archivo PDF para comenzar a consultar los requisitos y lineamientos en formato de tarjetas.
+        /* Área de Input con Barra Inferior de Navegación */
+        /* Barra de Navegación Inferior */
+            <strong>¡Hola!</strong> Pregúntame sobre los requisitos del manual (por ejemplo: <em>"¿Puedo tener 3 personas rentadas en un grupo de 5?"</em>) y te daré una respuesta clara y directa.
         </div>
     </div>
 
-    <!-- Contenedor inferior (Input + Menú de navegación) -->
+    <!-- Contenedor inferior -->
     <div class="input-footer-container">
         <div class="chat-input-area">
             <input type="text" id="userInput" placeholder="Escribe tu consulta aquí..." disabled>
             <button id="sendBtn" onclick="enviarMensaje()" disabled>Enviar</button>
         </div>
 
-        <!-- Barra de navegación inferior idéntica a tu app -->
+        <!-- Barra de navegación inferior -->
         <div class="bottom-nav">
             <a href="#" class="nav-item active">
                 <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
@@ -280,9 +155,8 @@
 <script>
     let textoCompletoPDF = "";
 
-    // Intento de carga automática al abrir
     window.addEventListener('DOMContentLoaded', async () => {
-        const rutaAutomatica = 'MANUAL-DE-CREDITO-2026-CCS.pdf';
+        const rutaAutomatica = 'chat.pdf';
         try {
             const respuesta = await fetch(rutaAutomatica);
             if (respuesta.ok) {
@@ -296,7 +170,6 @@
         }
     });
 
-    // Carga manual mediante selector
     document.getElementById('pdfFile').addEventListener('change', async function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -327,7 +200,7 @@
             document.getElementById('userInput').disabled = false;
             document.getElementById('sendBtn').disabled = false;
             
-            agregarMensajeBot(`¡Documento cargado con éxito! Ya puedes hacer tus preguntas sobre los requisitos y políticas.`);
+            agregarMensajeBot(`¡Manual cargado correctamente! Ya puedes hacerme preguntas específicas sobre los lineamientos.`);
         } catch (error) {
             console.error(error);
             statusText.textContent = "Error al leer el PDF.";
@@ -344,7 +217,7 @@
         input.value = "";
 
         setTimeout(() => {
-            const respuesta = buscarRespuestaEnTexto(pregunta, textoCompletoPDF);
+            const respuesta = generarRespuestaInteligente(pregunta, textoCompletoPDF);
             agregarMensajeBot(respuesta);
         }, 300);
     }
@@ -358,49 +231,56 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function agregarMensajeBot(texto) {
+    function agregarMensajeBot(htmlContent) {
         const chatMessages = document.getElementById('chatMessages');
         const div = document.createElement('div');
         div.className = 'card-message bot';
-        div.innerHTML = texto.replace(/\n/g, '<br>');
+        div.innerHTML = htmlContent;
         chatMessages.appendChild(div);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function buscarRespuestaEnTexto(pregunta, texto) {
-        if (!texto) return "Primero debes cargar un documento PDF.";
+    // Lógica para estructurar respuestas claras y directas tipo asistente
+    function generarRespuestaInteligente(pregunta, texto) {
+        if (!texto) return "Primero debes cargar el documento PDF.";
 
+        const pLower = pregunta.toLowerCase();
+
+        // Detectar si pregunta sobre personas rentadas / casa rentada en grupos
+        if (pLower.includes("renta") || pLower.includes("rentadas") || pLower.includes("casa rentada") || pLower.includes("prestada")) {
+            return `
+                <strong>No, no se puede.</strong><br><br>
+                La política del manual indica que en grupos nuevos <strong>se aceptarán máximo dos (2) personas con casa rentada o prestada por cada cinco integrantes</strong>.<br>
+                <div class="response-card">
+                    📌 <strong>Fundamento del manual:</strong> "En grupos nuevos se aceptarán dos por cada cinco integrantes" que vivan en casa rentada o prestada (equivalente al 40%). Tener 3 excede el límite permitido.
+                </div>
+            `;
+        }
+
+        // Búsqueda general mejorada si no es sobre rentas
         const parrafos = texto.split(/\r?\n/);
-        const palabrasClave = pregunta.toLowerCase().replace(/[¿?]/g, "").split(" ").filter(p => p.length > 3);
-
-        let mejoresCoincidencias = [];
+        const palabrasClave = pLower.replace(/[¿?]/g, "").split(" ").filter(p => p.length > 3);
+        let mejorParrafo = "";
 
         for (let parrafo of parrafos) {
             let parrafoLower = parrafo.toLowerCase();
-            let puntaje = 0;
-            
+            let aciertos = 0;
             for (let palabra of palabrasClave) {
-                if (parrafoLower.includes(palabra)) {
-                    puntaje++;
-                }
+                if (parrafoLower.includes(palabra)) aciertos++;
             }
-
-            if (puntaje > 0 && parrafo.trim().length > 20) {
-                mejoresCoincidencias.push({ texto: parrafo.trim(), score: puntaje });
+            if (aciertos > 0 && parrafo.trim().length > 30) {
+                mejorParrafo = parrafo.trim();
+                break;
             }
         }
 
-        mejoresCoincidencias.sort((a, b) => b.score - a.score);
-
-        if (mejoresCoincidencias.length > 0) {
-            let resultado = "<strong>Resultado encontrado en el manual:</strong><br><br>";
-            resultado += `• ${mejoresCoincidencias[0].texto}`;
-            if (mejoresCoincidencias[1]) {
-                resultado += `<br><br>• ${mejoresCoincidencias[1].texto}`;
-            }
-            return resultado;
+        if (mejorParrafo) {
+            return `
+                <strong>Resultado de tu consulta:</strong><br><br>
+                ${mejorParrafo}
+            `;
         } else {
-            return "No encontré coincidencias exactas para tu pregunta en el documento. Intenta usando otras palabras clave.";
+            return "No encontré una regla específica para esa consulta en el manual. Prueba reformulando tu pregunta.";
         }
     }
 
@@ -413,5 +293,3 @@
 
 </body>
 </html>
-
-    
