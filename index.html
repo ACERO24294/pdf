@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistente de Crédito - PWA</title>
+    <title>ChatBot Manual de Crédito</title>
     <!-- Librería PDF.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
@@ -13,9 +13,9 @@
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
-            --bg-main: #f8fafc;
+            --bg-main: #f1f5f9;
             --card-bg: #ffffff;
-            --text-main: #0f172a;
+            --text-main: #1e293b;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
         }
@@ -34,28 +34,28 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            padding: 12px;
+            overflow: hidden;
         }
 
         .app-container {
             width: 100%;
-            max-width: 650px;
-            height: 92vh;
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+            max-width: 500px;
+            height: 100vh;
+            background: var(--bg-main);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
+            position: relative;
         }
 
-        /* Encabezado */
+        /* Encabezado Estilo Tarjeta Oscura */
         .app-header {
             background: linear-gradient(135deg, #1e3a8a, #2563eb);
             color: white;
-            padding: 18px 20px;
+            padding: 20px 16px;
             text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .app-header h1 {
@@ -65,31 +65,25 @@
         }
 
         .app-header p {
-            font-size: 13px;
+            font-size: 12px;
             opacity: 0.85;
         }
 
-        /* Tarjeta de Estado / Control de Archivo */
+        /* Tarjeta de Estado del Documento */
         .card-status {
-            background: #ffffff;
+            background: var(--card-bg);
             margin: 12px 16px;
             padding: 12px 16px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .status-row {
-            display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
         }
 
         .status-text {
+            font-size: 13px;
             color: var(--text-muted);
             font-weight: 500;
         }
@@ -97,13 +91,12 @@
         .file-upload-btn {
             background: #eff6ff;
             color: var(--primary);
-            border: 1px dashed var(--primary);
+            border: 1px solid #bfdbfe;
             padding: 6px 12px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
-            text-align: center;
             transition: background 0.2s;
         }
 
@@ -115,10 +108,10 @@
             display: none;
         }
 
-        /* Contenedor de Mensajes (Estilo Tarjetas) */
+        /* Contenedor de Conversación en Tarjetas */
         .chat-messages {
             flex: 1;
-            padding: 0 16px 16px 16px;
+            padding: 0 16px 70px 16px; /* Espacio para que no lo tape el menú inferior */
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -126,12 +119,14 @@
         }
 
         .card-message {
-            padding: 12px 16px;
-            border-radius: 12px;
-            max-width: 85%;
+            background: var(--card-bg);
+            padding: 14px 16px;
+            border-radius: 14px;
+            max-width: 90%;
             line-height: 1.5;
-            font-size: 14px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            font-size: 13px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+            border: 1px solid var(--border-color);
             animation: fadeIn 0.3s ease;
         }
 
@@ -141,26 +136,33 @@
         }
 
         .card-message.bot {
-            background: #f1f5f9;
-            color: var(--text-main);
             align-self: flex-start;
-            border-bottom-left-radius: 4px;
-            border: 1px solid #e2e8f0;
+            border-left: 4px solid var(--primary);
         }
 
         .card-message.user {
             background: var(--primary);
             color: white;
             align-self: flex-end;
-            border-bottom-right-radius: 4px;
+            border: none;
         }
 
-        /* Área de Input */
+        /* Área de Input con Barra Inferior de Navegación Estilo App */
+        .input-footer-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+        }
+
         .chat-input-area {
             display: flex;
-            padding: 14px 16px;
-            background: white;
-            border-top: 1px solid var(--border-color);
+            padding: 10px 16px;
             gap: 8px;
         }
 
@@ -170,9 +172,8 @@
             border: 1px solid var(--border-color);
             border-radius: 10px;
             outline: none;
-            font-size: 14px;
+            font-size: 13px;
             background: #f8fafc;
-            transition: border-color 0.2s;
         }
 
         .chat-input-area input:focus {
@@ -184,76 +185,118 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0 18px;
+            padding: 0 16px;
             border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             transition: background 0.2s;
-        }
-
-        .chat-input-area button:hover:not(:disabled) {
-            background: var(--primary-hover);
         }
 
         .chat-input-area button:disabled {
             background: #cbd5e1;
             cursor: not-allowed;
         }
+
+        /* Barra de Navegación Inferior (Idéntica a tu otra pantalla) */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            background: var(--card-bg);
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 11px;
+            gap: 2px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- Encabezado -->
+    <!-- Encabezado con degradado -->
     <div class="app-header">
         <h1>Asistente Inteligente</h1>
         <p>Consulta el manual y documentos de forma interactiva</p>
     </div>
 
-    <!-- Tarjeta de Estado y Carga de PDF -->
+    <!-- Tarjeta de Estado / Carga de PDF -->
     <div class="card-status">
-        <div class="status-row">
-            <span id="statusText" class="status-text">Estado: Esperando documento...</span>
-            <label class="file-upload-btn" for="pdfFile">Cambiar PDF</label>
-            <input type="file" id="pdfFile" accept=".pdf">
-        </div>
+        <span id="statusText" class="status-text">Esperando documento...</span>
+        <label class="file-upload-btn" for="pdfFile">Cambiar PDF</label>
+        <input type="file" id="pdfFile" accept=".pdf">
     </div>
 
     <!-- Historial del Chat en Tarjetas -->
     <div class="chat-messages" id="chatMessages">
         <div class="card-message bot">
-            ¡Hola! Carga tu documento PDF o selecciona uno para comenzar a hacerle preguntas de manera inmediata.
+            <strong>¡Hola!</strong> Carga o selecciona tu archivo PDF para comenzar a consultar los requisitos y lineamientos en formato de tarjetas.
         </div>
     </div>
 
-    <!-- Barra inferior de escritura -->
-    <div class="chat-input-area">
-        <input type="text" id="userInput" placeholder="Escribe tu consulta aquí..." disabled>
-        <button id="sendBtn" onclick="enviarMensaje()" disabled>Enviar</button>
+    <!-- Contenedor inferior (Input + Menú de navegación) -->
+    <div class="input-footer-container">
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Escribe tu consulta aquí..." disabled>
+            <button id="sendBtn" onclick="enviarMensaje()" disabled>Enviar</button>
+        </div>
+
+        <!-- Barra de navegación inferior idéntica a tu app -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                Chat
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                Temas
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                Simulador
+            </a>
+        </div>
     </div>
 </div>
 
 <script>
     let textoCompletoPDF = "";
 
-    // 1. Intento de carga automática local/remota (si el servidor lo permite)
+    // Intento de carga automática al abrir
     window.addEventListener('DOMContentLoaded', async () => {
-        const rutaAutomatica = 'chat.pdf'; // Coloca aquí el nombre exacto de tu PDF
+        const rutaAutomatica = 'MANUAL-DE-CREDITO-2026-CCS.pdf';
         try {
             const respuesta = await fetch(rutaAutomatica);
             if (respuesta.ok) {
                 const blob = await respuesta.blob();
                 procesarArchivoPDF(blob);
             } else {
-                document.getElementById('statusText').textContent = "Selecciona tu PDF localmente abajo ↓";
+                document.getElementById('statusText').textContent = "Selecciona tu PDF abajo ↓";
             }
         } catch (e) {
-            document.getElementById('statusText').textContent = "Modo local: Sube tu PDF para iniciar.";
+            document.getElementById('statusText').textContent = "Sube tu PDF para iniciar.";
         }
     });
 
-    // 2. Carga manual mediante el selector (indispensable para pruebas locales por seguridad del navegador)
+    // Carga manual mediante selector
     document.getElementById('pdfFile').addEventListener('change', async function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -261,7 +304,6 @@
         }
     });
 
-    // Función unificada para procesar el PDF con PDF.js
     async function procesarArchivoPDF(source) {
         const statusText = document.getElementById('statusText');
         statusText.textContent = "Procesando documento...";
@@ -280,12 +322,12 @@
             }
 
             textoCompletoPDF = textoAcumulado;
-            statusText.textContent = `✓ Documento listo (${pdfDoc.numPages} páginas)`;
+            statusText.textContent = `✓ Documento listo (${pdfDoc.numPages} págs)`;
             
             document.getElementById('userInput').disabled = false;
             document.getElementById('sendBtn').disabled = false;
             
-            agregarMensajeBot(`¡Documento cargado con éxito! Ya puedes hacerme preguntas sobre su contenido.`);
+            agregarMensajeBot(`¡Documento cargado con éxito! Ya puedes hacer tus preguntas sobre los requisitos y políticas.`);
         } catch (error) {
             console.error(error);
             statusText.textContent = "Error al leer el PDF.";
@@ -293,7 +335,6 @@
         }
     }
 
-    // Manejo de mensajes del chat
     function enviarMensaje() {
         const input = document.getElementById('userInput');
         const pregunta = input.value.trim();
@@ -321,12 +362,11 @@
         const chatMessages = document.getElementById('chatMessages');
         const div = document.createElement('div');
         div.className = 'card-message bot';
-        div.textContent = texto;
+        div.innerHTML = texto.replace(/\n/g, '<br>');
         chatMessages.appendChild(div);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Buscador de contexto
     function buscarRespuestaEnTexto(pregunta, texto) {
         if (!texto) return "Primero debes cargar un documento PDF.";
 
@@ -353,14 +393,14 @@
         mejoresCoincidencias.sort((a, b) => b.score - a.score);
 
         if (mejoresCoincidencias.length > 0) {
-            let resultado = "Esto es lo que encontré en el documento:\n\n";
-            resultado += `• "${mejoresCoincidencias[0].texto}"`;
+            let resultado = "<strong>Resultado encontrado en el manual:</strong><br><br>";
+            resultado += `• ${mejoresCoincidencias[0].texto}`;
             if (mejoresCoincidencias[1]) {
-                resultado += `\n\n• "${mejoresCoincidencias[1].texto}"`;
+                resultado += `<br><br>• ${mejoresCoincidencias[1].texto}`;
             }
             return resultado;
         } else {
-            return "No encontré coincidencias exactas para tu pregunta. Intenta usar otras palabras clave.";
+            return "No encontré coincidencias exactas para tu pregunta en el documento. Intenta usando otras palabras clave.";
         }
     }
 
@@ -373,3 +413,5 @@
 
 </body>
 </html>
+
+    
